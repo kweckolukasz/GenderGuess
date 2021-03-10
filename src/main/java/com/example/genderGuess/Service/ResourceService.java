@@ -12,8 +12,8 @@ import javax.annotation.PostConstruct;
 public class ResourceService {
 
 
-    private final Resource femaleResource = new ClassPathResource("static/female_names.txt");
-    private final Resource maleResource = new ClassPathResource("static/male_names.txt");
+    private Resource femaleResource = new ClassPathResource("static/female_names.txt");
+    private Resource maleResource = new ClassPathResource("static/male_names.txt");
 
 
     public Resource getFemaleResource() {

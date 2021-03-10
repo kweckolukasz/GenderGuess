@@ -19,15 +19,13 @@ public class Dictionary {
     TreeMap<Character, Long> femaleDictionary;
     TreeMap<Character, Long> maleDictionary;
 
-    @Autowired
     ResourceService resourceService;
     Resource resource;
 
     boolean maleDictionaryCreated = false;
     boolean femaleDictionaryCreated = false;
 
-    @PostConstruct
-    private void initialize() {
+    public void Dictionary() {
         femaleDictionary = new TreeMap<>();
         maleDictionary = new TreeMap<>();
         try {
