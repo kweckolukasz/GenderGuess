@@ -1,7 +1,10 @@
 package com.example.genderGuess;
 
 import com.example.genderGuess.Service.ResourceService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
@@ -13,30 +16,38 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.TreeMap;
 
-@Service
 public class Dictionary {
+
+    Logger logger = LoggerFactory.getLogger(Dictionary.class);
 
     TreeMap<Character, Long> femaleDictionary;
     TreeMap<Character, Long> maleDictionary;
 
+    @Autowired
     ResourceService resourceService;
     Resource resource;
 
     boolean maleDictionaryCreated = false;
     boolean femaleDictionaryCreated = false;
 
-    public void Dictionary() {
+    public void dictionary() {
+        logger.info("inside Constructor");
         femaleDictionary = new TreeMap<>();
         maleDictionary = new TreeMap<>();
         try {
-            do {
+            while (!maleDictionaryCreated && !femaleDictionaryCreated) {
                 TreeMap<Character, Long> currentDictionary = null;
                 if (!femaleDictionaryCreated) {
                     resource = resourceService.getFemaleResource();
                     currentDictionary = femaleDictionary;
-                } else if (!maleDictionaryCreated) {
+                    currentDictionary.put('A', 0L);
+                    logger.info("female dictionary assigned");
+                }
+                if (!maleDictionaryCreated) {
                     resource = resourceService.getMaleResource();
                     currentDictionary = maleDictionary;
+                    currentDictionary.put('A', 0L);
+                    logger.info("male dictionary assigned");
                 }
 
                 InputStream inputStream = resource.getInputStream();
@@ -46,12 +57,18 @@ public class Dictionary {
                 Character current;
 
                 while (br.readLine() != null && currentDictionary != null) {
+
                     current = br.readLine().charAt(0);
-                    if (currentDictionary.isEmpty()) currentDictionary.put(current, lineCount);
-                    if (currentDictionary.containsKey(current)) currentDictionary.put(current, lineCount);
+
+                    if (currentDictionary.lastKey()<current) {
+                        currentDictionary.put(current, lineCount);
+                    }
                     lineCount++;
+
                 }
-            } while (!maleDictionaryCreated && !femaleDictionaryCreated);
+                if (currentDictionary == femaleDictionary) femaleDictionaryCreated = true;
+                if (currentDictionary == maleDictionary) maleDictionaryCreated = true;
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

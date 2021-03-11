@@ -61,7 +61,7 @@ public class JavaStreamsGuessingAlgorithm implements GuessingAlgorithm {
 
                     BufferedReader br = new BufferedReader(new InputStreamReader(namesStream, StandardCharsets.UTF_8));
                     String nextLine;
-                    char startChar = entry.getValue().charAt(0);
+                    char startChar = entry.getKey().charAt(0);
                     Long start = dictionary.get(dictionary.floorKey(startChar));
                     if (start == null) start = 0L;
                     String finalNextDbToRun = nextDbToRun;
@@ -73,7 +73,6 @@ public class JavaStreamsGuessingAlgorithm implements GuessingAlgorithm {
                                         entry.setValue(MALE);
                                     }
                                 }
-                                if (l.charAt(0)>startChar) return;
                             }
                     );
                     while ((nextLine = br.readLine()) != null) {

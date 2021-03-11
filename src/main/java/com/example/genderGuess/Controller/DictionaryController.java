@@ -19,6 +19,8 @@ import java.util.concurrent.atomic.AtomicLong;
 @RequestMapping("dictionary")
 public class DictionaryController {
 
+    PrintWriter printWriter;
+
     @Autowired
     Dictionary dictionaryService;
     TreeMap<Character, Long> dictionary;
@@ -30,6 +32,8 @@ public class DictionaryController {
     //dictionary?gender=male&range=ab
     @GetMapping(params = {"gender", "range"})
     public void getGenderNamesInRange(String gender, String range, HttpServletResponse response){
+
+
 
         gender = gender
                 .toUpperCase(Locale.ROOT)
@@ -51,21 +55,18 @@ public class DictionaryController {
 
         //TODO implement solution if user enter letters in reverse order like 'ba'
         Long startLine = dictionary.get(start);
-        long iterationsCount = dictionary.get(end) - startLine;
 
         try (InputStream in = resource.getInputStream()) {
             OutputStream out = response.getOutputStream();
+            printWriter = new PrintWriter(out);
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            AtomicLong counter = new AtomicLong(0L);
-            br.lines().skip(startLine).forEach(
+            //AtomicLong counter = new AtomicLong(0L);
+            //TODO implement skipping startLine lines
+            br.lines().forEach(
                     l -> {
-                        try {
-                            out.write(l.getBytes(StandardCharsets.UTF_8));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        printWriter.println(l);
                         //TODO implement breaking of iteration (Spliterator?)
-                        counter.getAndIncrement();
+                        //counter.getAndIncrement();
                     }
             );
 
