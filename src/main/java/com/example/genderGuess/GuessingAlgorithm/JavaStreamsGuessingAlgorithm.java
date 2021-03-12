@@ -35,10 +35,8 @@ public class JavaStreamsGuessingAlgorithm implements GuessingAlgorithm {
     @Override
     public Map<String, String> guessGenderFromGivenNames(Map<String, String> names) {
 
-        TreeMap<Character, Long> dictionary = dictionaryRepo.getFemaleDictionary();
-
-
         names.entrySet().forEach(entry -> {
+            TreeMap<Character, Long> dictionary = new TreeMap<>();
             if (!entry.getValue().isEmpty()) return;
             boolean maleDbChecked = false;
             boolean femaleDbChecked = false;
@@ -49,12 +47,15 @@ public class JavaStreamsGuessingAlgorithm implements GuessingAlgorithm {
                 if ((entry.getKey().charAt(entry.getKey().length() - 1) == 'A') && !femaleDbChecked) {
                     nextDbToRun = femaleDb;
                     resource = resourceService.getFemaleResource();
+                    dictionary = dictionaryRepo.getFemaleDictionary();
                 } else if (!maleDbChecked) {
                     nextDbToRun = maleDb;
                     resource = resourceService.getMaleResource();
+                    dictionary = dictionaryRepo.getMaleDictionary();
                 } else if (!femaleDbChecked) {
                     nextDbToRun = femaleDb;
                     resource = resourceService.getFemaleResource();
+                    dictionary = dictionaryRepo.getFemaleDictionary();
                 }
 
                 try (InputStream namesStream = resource.getInputStream()) {

@@ -22,3 +22,11 @@ dependencies {
 test {
 	useJUnitPlatform()
 }
+
+bootJar{
+	launchScript()
+}
+
+springBoot {
+	mainClass = 'com.example.genderGuess.GenderGuessApplication'
+}

@@ -2,8 +2,10 @@ package com.example.genderGuess.GuessingAlgorithm;
 
 import com.example.genderGuess.Service.ResourceService;
 import org.junit.jupiter.api.*;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -17,6 +19,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class JavaStreamsGuessingAlgorithmTest {
 
+    @Spy
+    @InjectMocks
+    JavaStreamsGuessingAlgorithm guessingAlgorithm;
+
+    @Mock
+    @InjectMocks
+    ResourceService resourceService;
 
     LinkedHashMap<String,String> names = new LinkedHashMap<>();
 
@@ -46,7 +55,7 @@ class JavaStreamsGuessingAlgorithmTest {
     @DisplayName("are Male Names Discovered Correctly")
     void areMaleNamesDiscoveredCorrectly(){
 
-        JavaStreamsGuessingAlgorithm guessingAlgorithm = Mockito.mock(JavaStreamsGuessingAlgorithm.class);
+
         Mockito.when(guessingAlgorithm.resourceService.getMaleResource()).thenReturn(new ClassPathResource("static/fake_male_names.txt"));
         Mockito.when(guessingAlgorithm.resourceService.getFemaleResource()).thenReturn(new ClassPathResource("static/fake_female_names.txt"));
 
