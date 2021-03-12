@@ -1,11 +1,12 @@
 package com.example.genderGuess.Service;
 
+import com.example.genderGuess.Model.Name;
+
+import java.util.List;
 import java.util.Map;
 
 public interface RefactorService {
 
-    Map<String, String> refactorGivenMultipleNameString(String providedName);
-
-    Map<String, String> refactorGivenSingleNameString(String providedName);
+    List<Name> cleanUpFormatAndExportGivenString(String providedName);
 
 }

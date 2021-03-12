@@ -1,11 +1,12 @@
 package com.example.genderGuess.Controller;
 
 import com.example.genderGuess.GuessingAlgorithm.GuessingAlgorithm;
+import com.example.genderGuess.Model.Name;
 import com.example.genderGuess.Service.RefactorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import java.util.List;
 
 @RestController
 @RequestMapping("/name")
@@ -16,26 +17,21 @@ public class NameController {
     @Autowired
     GuessingAlgorithm guessingAlgorithm;
 
-    Map<String,String> givenName;
+    List<Name> givenNames;
 
-    @GetMapping
-    @ResponseBody
-    public String home(){
-        return "Hello world!";
-    }
 
     @GetMapping("/{providedName}")
     @ResponseBody
     public String guessGender(@PathVariable String providedName){
 
         try {
-            givenName = refactorService.refactorGivenSingleNameString(providedName);
+            givenNames = refactorService.cleanUpFormatAndExportGivenString(providedName);
         } catch (IllegalArgumentException e) {
             return e.getMessage();
         }
 
-        givenName = guessingAlgorithm.guessGenderFromGivenNames(givenName);
+        givenNames = guessingAlgorithm.guessGenderFromGivenNames(givenNames);
 
-        return givenName.entrySet().iterator().next().getValue();
+        return givenNames.get(0).getGender().toString();
     }
 }

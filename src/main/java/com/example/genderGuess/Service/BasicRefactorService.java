@@ -1,13 +1,11 @@
 package com.example.genderGuess.Service;
 
 import com.example.genderGuess.GuessingAlgorithm.GuessingAlgorithm;
+import com.example.genderGuess.Model.Name;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class BasicRefactorService implements RefactorService {
@@ -15,29 +13,36 @@ public class BasicRefactorService implements RefactorService {
     @Autowired
     GuessingAlgorithm algorithm;
 
-    Map<String,String> names;
+    List<Name> names;
 
-    @Override
-    public Map<String, String> refactorGivenMultipleNameString(String providedName) {
 
-        names = cleanUpFormatAndExportGivenString(providedName);
+    public List<Name> cleanUpFormatAndExportGivenString(String providedName){
+
+        providedName = cleanUpAndFormat(providedName);
+
+        exportNamesToList(providedName);
+
         return names;
     }
 
-    @Override
-    public Map<String, String> refactorGivenSingleNameString(String providedName) {
+    private void exportNamesToList(String providedName) {
+        char[] chars = providedName.toCharArray();
 
-        LinkedHashMap<String,String> namesMap = (LinkedHashMap<String, String>) cleanUpFormatAndExportGivenString(providedName);
-        Map.Entry<String, String> firstEntry = namesMap.entrySet().iterator().next();
-        names.put(firstEntry.getKey(), firstEntry.getValue());
-        return names;
+        int start = 0;
+        for (int i = 0; i < chars.length; i++){
+            char character = chars[i];
+            if (!(Character.isLetter(character)||character=='_')) throw new IllegalArgumentException("Name should consist of letters, whitespace is allowed if you provide multiple names");
+            if (character == '_'){
+                names.add(
+                        new Name(providedName.substring(start,i))
+                );
+                start = i+1;
+            }
 
+        }
     }
 
-    private Map<String,String> cleanUpFormatAndExportGivenString(String providedName){
-
-        names = new LinkedHashMap<>();
-
+    private String cleanUpAndFormat(String providedName) {
         providedName = providedName
                 .trim()
                 .replaceAll(" +", " ")
@@ -47,23 +52,7 @@ public class BasicRefactorService implements RefactorService {
         StringBuilder sb = new StringBuilder(providedName);
         sb.append('_');
         providedName = sb.toString();
-
-        char[] chars = providedName.toCharArray();
-
-        int start = 0;
-        for (int i = 0; i < chars.length; i++){
-            char character = chars[i];
-            if (!(Character.isLetter(character)||character=='_')) throw new IllegalArgumentException("Name should consist of letters, whitespace is allowed if you provide multiple names");
-            if (character == '_'){
-                names.put(
-                        providedName.substring(start,i),
-                        ""
-                );
-                start = i+1;
-            }
-
-        }
-        return names;
+        return providedName;
     }
 
 

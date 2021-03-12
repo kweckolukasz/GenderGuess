@@ -1,6 +1,8 @@
 package com.example.genderGuess.GuessingAlgorithm;
 
 import com.example.genderGuess.Dictionary;
+import com.example.genderGuess.Model.GENDERS;
+import com.example.genderGuess.Model.Name;
 import com.example.genderGuess.Service.ResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -11,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -32,73 +35,63 @@ public class JavaStreamsGuessingAlgorithm implements GuessingAlgorithm {
     @Autowired
     Dictionary dictionaryRepo;
 
+    TreeMap<Character, Long> dictionary;
+
+
+
     @Override
-    public Map<String, String> guessGenderFromGivenNames(Map<String, String> names) {
+    public List<Name> guessGenderFromGivenNames(List<Name> names) {
 
-        names.entrySet().forEach(entry -> {
-            TreeMap<Character, Long> dictionary = new TreeMap<>();
-            if (!entry.getValue().isEmpty()) return;
-            boolean maleDbChecked = false;
-            boolean femaleDbChecked = false;
+        for (Name name :
+                names) {
+            setNextGenderToCheck(name);
+            setResourceAndDictionaryForCheckingGivenGender(name);
+            GuessGenders(name);
+        }
+        return names;
+    }
 
-            do {
-                String nextDbToRun = "";
-                //Female names ends with 'a' check given names if they are, for those that are search females first
-                if ((entry.getKey().charAt(entry.getKey().length() - 1) == 'A') && !femaleDbChecked) {
-                    nextDbToRun = femaleDb;
-                    resource = resourceService.getFemaleResource();
-                    dictionary = dictionaryRepo.getFemaleDictionary();
-                } else if (!maleDbChecked) {
-                    nextDbToRun = maleDb;
-                    resource = resourceService.getMaleResource();
-                    dictionary = dictionaryRepo.getMaleDictionary();
-                } else if (!femaleDbChecked) {
-                    nextDbToRun = femaleDb;
-                    resource = resourceService.getFemaleResource();
-                    dictionary = dictionaryRepo.getFemaleDictionary();
-                }
+    private void setNextGenderToCheck(Name name) {
+        if ((name.getName().charAt(name.getName().length() - 1) == 'A') && !name.isFemaleChecked())
+            name.setGenderToCheck(GENDERS.FEMALE);
+        else if (name.isFemaleChecked()) name.setGenderToCheck(GENDERS.MALE);
+        else if (name.isMaleChecked()) name.setGenderToCheck(GENDERS.FEMALE);
+    }
 
-                try (InputStream namesStream = resource.getInputStream()) {
+    private void setResourceAndDictionaryForCheckingGivenGender(Name name) {
+        switch (name.getGenderToCheck()){
+            case MALE:{
+                resource = resourceService.getMaleResource();
+                dictionary = dictionaryRepo.getMaleDictionary();
+            }
+            break;
+            case FEMALE:{
+                resource = resourceService.getFemaleResource();
+                dictionary = dictionaryRepo.getFemaleDictionary();
+            }
+            break;
+        }
+    }
 
-                    BufferedReader br = new BufferedReader(new InputStreamReader(namesStream, StandardCharsets.UTF_8));
-                    String nextLine;
-                    char startChar = entry.getKey().charAt(0);
-                    Long start = dictionary.get(dictionary.floorKey(startChar));
-                    if (start == null) start = 0L;
-                    String finalNextDbToRun = nextDbToRun;
-                    br.lines().skip(start).forEach(l -> {
-                                if (l.equals(entry.getKey())) {
-                                    if (finalNextDbToRun.equals(femaleDb)) {
-                                        entry.setValue(FEMALE);
-                                    } else {
-                                        entry.setValue(MALE);
-                                    }
-                                }
-                            }
-                    );
-                    while ((nextLine = br.readLine()) != null) {
-                        if (nextLine.equals(entry.getKey())) {
-                            if (nextDbToRun.equals(femaleDb)) {
-                                entry.setValue(FEMALE);
-                            } else {
-                                entry.setValue(MALE);
+    private void GuessGenders(Name name) {
+        while(!(name.isFemaleChecked() && name.isMaleChecked())){
+            try (InputStream namesStream = resource.getInputStream()) {
+                BufferedReader br = new BufferedReader(new InputStreamReader(namesStream, StandardCharsets.UTF_8));
+                String nextLine;
+                Long start = dictionary.get(dictionary.floorKey(name.getStartChar()));
+                if (start == null) start = 0L;
+                br.lines().skip(start).forEach(l -> {
+                            if (l.equals(name.getName())) {
+                                if (name.getGenderToCheck().equals(GENDERS.FEMALE)) name.setGender(GENDERS.FEMALE);
+                                if (name.getGenderToCheck().equals(GENDERS.MALE)) name.setGender(GENDERS.MALE);
                             }
                         }
-                    }
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                if (nextDbToRun.equals(maleDb)) maleDbChecked = true;
-                else if (nextDbToRun.equals(femaleDb)) femaleDbChecked = true;
-
-                if (maleDbChecked && femaleDbChecked && entry.getValue().isEmpty()) entry.setValue(INCONCLUSIVE);
-
-            } while (entry.getValue().isEmpty());
-
-        });
-
-        return names;
+                );
+                br.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if ((name.isFemaleChecked() && name.isMaleChecked()) && name.getGender() == null) name.setGender(GENDERS.INCONCLUSIVE);
     }
 }

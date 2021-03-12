@@ -33,29 +33,17 @@ public class DictionaryController {
     @GetMapping(params = {"gender", "range"})
     public void getGenderNamesInRange(String gender, String range, HttpServletResponse response){
 
-
-
-        gender = gender
-                .toUpperCase(Locale.ROOT)
-                .trim();
-        range = range
-                .toUpperCase(Locale.ROOT)
-                .trim();
-
-        if (gender.equals("FEMALE")){
-            resource = resourceService.getFemaleResource();
-            dictionary = dictionaryService.getFemaleDictionary();
-        } else if (gender.equals("MALE")){
-            resource = resourceService.getMaleResource();
-            dictionary = dictionaryService.getMaleDictionary();
-        }
+        setResourceAndDictionaryForGivenGender(gender, range);
 
         Character start = range.charAt(0);
         Character end = range.charAt(1);
-
         //TODO implement solution if user enter letters in reverse order like 'ba'
         Long startLine = dictionary.get(start);
 
+        makeResponseOfNames(response);
+    }
+
+    private void makeResponseOfNames(HttpServletResponse response) {
         try (InputStream in = resource.getInputStream()) {
             OutputStream out = response.getOutputStream();
             printWriter = new PrintWriter(out);
@@ -73,6 +61,23 @@ public class DictionaryController {
             out.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void setResourceAndDictionaryForGivenGender(String gender, String range) {
+        gender = gender
+                .toUpperCase(Locale.ROOT)
+                .trim();
+        range = range
+                .toUpperCase(Locale.ROOT)
+                .trim();
+
+        if (gender.equals("FEMALE")){
+            resource = resourceService.getFemaleResource();
+            dictionary = dictionaryService.getFemaleDictionary();
+        } else if (gender.equals("MALE")){
+            resource = resourceService.getMaleResource();
+            dictionary = dictionaryService.getMaleDictionary();
         }
     }
 
