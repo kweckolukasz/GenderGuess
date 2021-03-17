@@ -1,15 +1,13 @@
 package com.example.genderGuess.Controller;
 
-import com.example.genderGuess.GuessingAlgorithm.GuessingAlgorithm;
+import com.example.genderGuess.Service.GuessingAlgorithm.GuessingAlgorithm;
 import com.example.genderGuess.Model.GENDERS;
 import com.example.genderGuess.Model.Name;
-import com.example.genderGuess.Service.RefactorService;
+import com.example.genderGuess.Service.Refactor.RefactorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
 @RequestMapping("/names")

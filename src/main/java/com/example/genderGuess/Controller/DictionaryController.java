@@ -1,7 +1,7 @@
 package com.example.genderGuess.Controller;
 
-import com.example.genderGuess.Dictionary;
-import com.example.genderGuess.Service.ResourceService;
+import com.example.genderGuess.Service.Dictionary.Dictionary;
+import com.example.genderGuess.Service.Resource.ResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,10 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.TreeMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
 @RequestMapping("dictionary")

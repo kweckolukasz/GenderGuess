@@ -1,14 +1,12 @@
-package com.example.genderGuess;
+package com.example.genderGuess.Service.Dictionary;
 
-import com.example.genderGuess.Service.ResourceService;
+import com.example.genderGuess.Service.Resource.ResourceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,22 +14,24 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.TreeMap;
 
+@Service
 public class Dictionary {
 
-    Logger logger = LoggerFactory.getLogger(Dictionary.class);
+    Logger logger = LoggerFactory.getLogger(Dictionary.class.getSimpleName());
 
     TreeMap<Character, Long> femaleDictionary;
     TreeMap<Character, Long> maleDictionary;
 
     @Autowired
     ResourceService resourceService;
+
     Resource resource;
 
     boolean maleDictionaryCreated = false;
     boolean femaleDictionaryCreated = false;
 
-    public void dictionary() {
-        logger.info("inside Constructor");
+    public void init() {
+        logger.info("init");
         femaleDictionary = new TreeMap<>();
         maleDictionary = new TreeMap<>();
         try {
@@ -41,13 +41,13 @@ public class Dictionary {
                     resource = resourceService.getFemaleResource();
                     currentDictionary = femaleDictionary;
                     currentDictionary.put('A', 0L);
-                    logger.info("female dictionary assigned");
+
                 }
                 if (!maleDictionaryCreated) {
                     resource = resourceService.getMaleResource();
                     currentDictionary = maleDictionary;
                     currentDictionary.put('A', 0L);
-                    logger.info("male dictionary assigned");
+
                 }
 
                 InputStream inputStream = resource.getInputStream();
@@ -75,9 +75,12 @@ public class Dictionary {
 
     }
 
+
     public TreeMap<Character, Long> getFemaleDictionary() {
         return femaleDictionary;
     }
+
+
 
     public TreeMap<Character, Long> getMaleDictionary() {
         return maleDictionary;
